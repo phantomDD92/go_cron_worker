@@ -10,6 +10,7 @@ type GithubRepo struct {
 	WebsitePageTypes string    `gorm:"size:255;column:website_page_types"`
 	RepoName         string    `gorm:"size:255;column:repo_name"`
 	RepoURL          string    `gorm:"size:255;column:repo_url"`
+	RepoImageURL     string    `gorm:"size:255;column:repo_image_url"`
 	RepoSummary      string    `gorm:"size:255;column:repo_summary"`
 	RepoOwner        string    `gorm:"size:255;column:repo_owner"`
 	RepoCreatedDate  time.Time `gorm:"not null;column:repo_created_date"`

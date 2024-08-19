@@ -139,22 +139,6 @@ func Github_GetSearchResult(query string, page int, info *Github_SearchResult) e
 	return err
 }
 
-func Github_UpdateDB(repo *models.GithubRepo) (updated bool, err error) {
-	var record models.GithubRepo
-	db := db.GetDB()
-	result := db.Where("repo_url = ?", repo.RepoURL).First(&record)
-	if result.Error != nil {
-		result := db.Create(&repo)
-		return true, result.Error
-	}
-	record.RepoStars = repo.RepoStars
-	record.RepoForks = repo.RepoForks
-	record.RepoLastUpdated = repo.RepoLastUpdated
-	record.RepoMaintained = repo.RepoMaintained
-	result = db.Save(&record)
-	return false, result.Error
-}
-
 func Github_FindRecord(url string, record *models.GithubRepo) bool {
 	dbInst := db.GetDB()
 	result := dbInst.Where("repo_url = ?", url).First(record)

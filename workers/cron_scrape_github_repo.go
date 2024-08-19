@@ -66,6 +66,7 @@ func Github_SearchRepos(query string) {
 				record.CodeLanguage = info.Language
 				record.CodeLibrary = info.Libraries
 				record.CodeLevel = info.CodeLevel
+				record.RepoImageURL = fmt.Sprintf("https://github.com/%s.png", info.Owner)
 				if err := utils.Github_CreateRecord(&record); err != nil {
 					println("--- : ", info.Url)
 					continue
