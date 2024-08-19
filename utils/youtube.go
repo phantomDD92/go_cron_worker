@@ -417,7 +417,6 @@ func YouTube_ParseByChatGpt(info *YouTubeVideo_Info) error {
 		return err
 	}
 	content := strings.ReplaceAll(resp.Choices[0].Message.Content, "*", "")
-	println(content)
 	sentences := strings.Split(content, "\n")
 	parsedCount := 0
 	for _, sentence := range sentences {

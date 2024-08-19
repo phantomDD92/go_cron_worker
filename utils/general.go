@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
 	//"log"
 )
 
@@ -113,4 +115,10 @@ func ParseTextFromPattern(text string, pattern string) (string, error) {
 		return "", errors.New("pattern not found")
 	}
 	return result, nil
+}
+
+func ExtractTextFromTag(textTag *goquery.Selection) string {
+	text := textTag.Text()
+	re := regexp.MustCompile(`\s+`)
+	return re.ReplaceAllString(strings.TrimSpace(text), " ")
 }
