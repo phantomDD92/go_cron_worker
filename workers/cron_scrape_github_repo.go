@@ -138,7 +138,7 @@ func Github_UpdateDB(repo *models.GithubRepo) (updated bool, err error) {
 }
 
 func Github_SearchRepos(query string) {
-	fileName := "cron_run_proxy_tester_queue.go"
+	fileName := "cron_scrape_github_repo.go"
 	emptyErrMap := make(map[string]interface{})
 	var searchResult GithubSearchResult
 	var searchCount, createCount, errorCount int

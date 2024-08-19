@@ -18,7 +18,7 @@ type GithubRepo struct {
 	RepoStars        int       `gorm:"column:repo_stars"`
 	RepoForks        int       `gorm:"column:repo_forks"`
 	CodeLanguage     string    `gorm:"size:255;column:code_language"`
-	CodeLibrary      string    `gorm:"size:255;column:code_library"`
+	CodeLibrary      string    `gorm:"size:255;column:code_libraries"`
 	CodeLevel        string    `gorm:"size:255;column:code_level"`
 	CodeWorks        string    `gorm:"size:255;column:code_works"`
 	CreatedAt        time.Time

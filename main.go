@@ -50,6 +50,7 @@ func main() {
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
 		workers.CronCheckProxyProviderCredits()
+		go workers.CronScrapeGithubRepo()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
 
@@ -57,7 +58,6 @@ func main() {
 		logger.LogTextSpace("DEVELOPMENT MODE: No args specified. Use args to specify which worker to run.")
 
 	} else {
-
 		if args[0] == "test" {
 
 			// workers.RunTestScript()
@@ -148,6 +148,10 @@ func main() {
 
 		if args[0] == "RunProxyTesterQueue" {
 			workers.RunProxyTesterQueue()
+		}
+
+		if args[0] == "CheckGithubScraper" {
+			workers.RunScrapeGithubRepo()
 		}
 	}
 }
