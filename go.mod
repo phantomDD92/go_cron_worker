@@ -11,6 +11,7 @@ require (
 	github.com/jackc/pgx/v4 v4.14.0 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
+	github.com/sashabaranov/go-openai v1.28.2 // indirect
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.9.4
 	github.com/stretchr/testify v1.8.4 // indirect

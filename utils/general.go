@@ -99,3 +99,18 @@ func ParseIntFromPattern(text string, pattern string, splitter ...string) (int, 
 	num, err := strconv.Atoi(strings.ReplaceAll(result, split, ""))
 	return num, err
 }
+
+func ParseTextFromPattern(text string, pattern string) (string, error) {
+	// Compile the regular expression pattern
+	re := regexp.MustCompile(pattern)
+	// Find all matches of the pattern in the input string
+	matches := re.FindAllStringSubmatch(text, -1)
+	// Extract the first match (which should be the number)
+	var result string
+	if len(matches) > 0 {
+		result = matches[0][1]
+	} else {
+		return "", errors.New("pattern not found")
+	}
+	return result, nil
+}
