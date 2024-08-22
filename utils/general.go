@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -121,4 +122,34 @@ func ExtractTextFromTag(textTag *goquery.Selection) string {
 	text := textTag.Text()
 	re := regexp.MustCompile(`\s+`)
 	return re.ReplaceAllString(strings.TrimSpace(text), " ")
+}
+
+func ParseDate(dateStr string) (time.Time, error) {
+	formats := []string{
+		time.RFC3339,
+		"Jan 2, 2006",
+		"02.01.2006",
+		"2 thg 1, 2006",
+		"January 2, 2006",
+		"2006-01-02",
+		"01/02/2006",
+	}
+
+	var parsedTime time.Time
+	var err error
+	for _, format := range formats {
+		parsedTime, err = time.Parse(format, dateStr)
+		if err == nil {
+			return parsedTime, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("date format not recognized")
+}
+
+func ParseGithubRepo(url string) (string, error) {
+	repo, err := ParseTextFromPattern(url, `(https\:\/\/github.com\/[^\/]+\/[^\/\&\s\.]+)`)
+	if err != nil {
+		return "", err
+	}
+	return repo, nil
 }

@@ -37,6 +37,7 @@ func YouTube_StartSearch(query string) {
 		}
 		for _, link := range links {
 			info := utils.YouTubeVideo_Info{}
+			answer := utils.ChatGPT_Answer{}
 			record := models.MarketingWebsiteVideo{}
 			if utils.YouTube_FindRecord(link, &record) {
 				if err := utils.YouTube_ParseVideo(link, &info, true); err != nil {
@@ -56,7 +57,7 @@ func YouTube_StartSearch(query string) {
 					println("--- : ", link)
 					continue
 				}
-				if err := utils.YouTube_ParseByChatGpt(&info); err != nil {
+				if err := utils.ChatGPT_GetAnswerForYoutube(info.Desc, info.Transcript, &answer); err != nil {
 					println("... : ", link)
 					continue
 				}
@@ -70,12 +71,12 @@ func YouTube_StartSearch(query string) {
 				record.VideoViews = info.Views
 				record.VideoPreviewImageUrl = info.Thumbnail
 				record.CodeGithubRepo = info.Repo
-				record.CodeLanguage = info.Language
-				record.CodeLevel = info.CodeLevel
-				record.CodeLibraries = info.Libraries
-				record.WebsitePageTypes = info.PageType
-				record.VideoSummary = info.Summary
-				record.Website = info.WebPage
+				record.CodeLanguage = answer.Language
+				record.CodeLevel = answer.CodeLevel
+				record.CodeLibraries = answer.Libraries
+				record.WebsitePageTypes = answer.PageType
+				record.VideoSummary = answer.Summary
+				record.Website = answer.WebSite
 				if err := utils.YouTube_CreateRecord(&record); err != nil {
 					println("--- : ", link)
 					continue

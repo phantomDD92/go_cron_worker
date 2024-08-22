@@ -1,33 +1,26 @@
 package utils
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"go_proxy_worker/db"
 	"go_proxy_worker/models"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/sashabaranov/go-openai"
 )
 
 type Github_RepoInfo struct {
-	Website    string    `json:"web_site"`
-	PageType   string    `json:"page_type"`
 	Url        string    `json:"url"`
 	Name       string    `json:"name"`
 	Summary    string    `json:"summary"`
 	Owner      string    `json:"owner"`
 	Language   string    `json:"language"`
 	Libraries  string    `json:"libraires"`
-	CodeLevel  string    `json:"code_level"`
 	Stars      int       `json:"stars"`
 	Forks      int       `json:"forks"`
 	CreatedAt  time.Time `json:"createdAt"`
@@ -123,7 +116,7 @@ func Github_GetRepoResult(entry *Github_RepoEntry, info *Github_RepoInfo) error 
 
 func Github_GetSearchResult(query string, page int, info *Github_SearchResult) error {
 	url := "https://github.com/search?q=" + strings.ReplaceAll(query, " ", "+") + "&type=repositories&p=" + strconv.Itoa(page)
-	body, err := GetHtmlByProxy(url)
+	body, err := GetHtmlByProxy(url, false)
 	if err != nil {
 		return err
 	}
@@ -155,54 +148,4 @@ func Github_CreateRecord(record *models.GithubRepo) error {
 	dbInst := db.GetDB()
 	result := dbInst.Create(&record)
 	return result.Error
-}
-
-func Github_ParseByChatGpt(info *Github_RepoInfo) error {
-	openaiKey := os.Getenv("CHATGPT_API_KEY")
-	client := openai.NewClient(openaiKey)
-	prompt := fmt.Sprintf("two-sentence summary, the programming language used, the libraries used, the website being scraped, the page types being scraped, the sophistication of the code - beginner, immediate, professional from the following description and readme:\n %s, %s", info.Summary, info.Readme)
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT4oMini20240718,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
-			},
-		},
-	)
-	if err != nil {
-		return err
-	}
-	content := strings.ReplaceAll(resp.Choices[0].Message.Content, "*", "")
-	sentences := strings.Split(content, "\n")
-	parsedCount := 0
-	for _, sentence := range sentences {
-		if len(sentence) < 3 {
-			continue
-		}
-		tags := strings.Split(sentence, ":")
-		if len(tags) == 2 {
-			key := strings.ToLower(tags[0])
-			value := strings.TrimSpace(tags[1])
-			if strings.Contains(key, "website being scraped") {
-				info.Website = value
-				parsedCount++
-			} else if strings.Contains(key, "page types being scraped") {
-				info.PageType = value
-				parsedCount++
-			} else if info.Libraries == "" && strings.Contains(key, "libraries used") {
-				info.Libraries = value
-			} else if strings.Contains(key, "sophistication of the code") {
-				info.CodeLevel = value
-				parsedCount++
-			}
-		}
-	}
-	if parsedCount != 3 {
-		return errors.New("insufficient parse")
-	}
-	return nil
 }

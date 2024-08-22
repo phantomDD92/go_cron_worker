@@ -31,6 +31,7 @@ func Github_SearchRepos(query string) {
 		pageMax = searchResult.Payload.PageCount
 		for _, el := range searchResult.Payload.Results {
 			record := models.GithubRepo{}
+			answer := utils.ChatGPT_Answer{}
 			info := utils.Github_RepoInfo{}
 			if err := utils.Github_GetRepoResult(&el, &info); err != nil {
 				log.Println("--- : ", info.Url)
@@ -48,12 +49,10 @@ func Github_SearchRepos(query string) {
 				updateCount += 1
 				log.Println("*** : ", info.Url)
 			} else {
-				if err := utils.Github_ParseByChatGpt(&info); err != nil {
+				if err := utils.ChatGPT_GetAnswerForGithub(info.Summary, info.Readme, &answer); err != nil {
 					println("... : ", info.Url)
 					continue
 				}
-				record.Website = info.Website
-				record.WebsitePageTypes = info.PageType
 				record.RepoName = info.Name
 				record.RepoURL = info.Url
 				record.RepoSummary = info.Summary
@@ -64,9 +63,15 @@ func Github_SearchRepos(query string) {
 				record.RepoStars = info.Stars
 				record.RepoForks = info.Forks
 				record.CodeLanguage = info.Language
-				record.CodeLibrary = info.Libraries
-				record.CodeLevel = info.CodeLevel
 				record.RepoImageURL = fmt.Sprintf("https://github.com/%s.png", info.Owner)
+				if info.Libraries != "" {
+					record.CodeLibraries = info.Libraries
+				} else {
+					record.CodeLibraries = answer.Libraries
+				}
+				record.CodeLevel = answer.CodeLevel
+				record.Website = answer.WebSite
+				record.WebsitePageTypes = answer.PageType
 				if err := utils.Github_CreateRecord(&record); err != nil {
 					println("--- : ", info.Url)
 					continue

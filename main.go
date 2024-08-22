@@ -52,6 +52,7 @@ func main() {
 		go workers.CronCheckProxyProviderCredits()
 		go workers.CronScrapeGithubRepo()
 		go workers.CronScrapeYoutubeVideo()
+		go workers.CronScrapeGoogleArticle()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
 
@@ -157,6 +158,10 @@ func main() {
 
 		if args[0] == "CheckYoutubeScraper" {
 			workers.RunScrapeYoutubeVideo()
+		}
+
+		if args[0] == "CheckArticleScraper" {
+			workers.RunScrapeGoogleArticle()
 		}
 	}
 }

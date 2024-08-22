@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,12 +8,10 @@ import (
 	"go_proxy_worker/models"
 	"log"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/sashabaranov/go-openai"
 )
 
 type YouTubeVideo_VideoDescriptionHeaderRenderer struct {
@@ -135,12 +132,6 @@ type YouTubeVideo_Info struct {
 	Duration   int       `json:"duration"`
 	Repo       string    `json:"repo"`
 	Transcript string    `json:"caption"`
-	Summary    string    `json:"summary"`
-	Language   string    `json:"language"`
-	Libraries  string    `json:"libraries"`
-	PageType   string    `json:"page_type"`
-	CodeLevel  string    `json:"code_level"`
-	WebPage    string    `json:"web_page"`
 	Thumbnail  string    `json:"thumbnail"`
 }
 
@@ -272,7 +263,7 @@ func YouTube_ParseStructuredDescription(content interface{}, data *YouTubeVideo_
 }
 
 func YouTube_ParseVideo(link string, data *YouTubeVideo_Info, simple bool) error {
-	body, err := GetHtmlByProxy(link)
+	body, err := GetHtmlByProxy(link, false)
 	if err != nil {
 		log.Fatal(err.Error())
 		return err
@@ -344,7 +335,7 @@ func YouTube_ParseVideo(link string, data *YouTubeVideo_Info, simple bool) error
 	}
 	if len(resp.Captions.PlayerCaptionsTracklistRenderer.CaptionTracks) > 0 {
 		url := resp.Captions.PlayerCaptionsTracklistRenderer.CaptionTracks[0].BaseUrl
-		if transcript, err := GetHtmlByProxy(url); err == nil {
+		if transcript, err := GetHtmlByProxy(url, false); err == nil {
 			data.Transcript = transcript
 		} else {
 			return err
@@ -356,7 +347,7 @@ func YouTube_ParseVideo(link string, data *YouTubeVideo_Info, simple bool) error
 }
 
 func YouTube_ParseYoutubeLinks(url string, page int) (youtubeLinks []string, nextUrl string, err error) {
-	body, err := GetHtmlByProxy(url)
+	body, err := GetHtmlByProxy(url, false)
 	if err != nil {
 		return youtubeLinks, nextUrl, err
 	}
@@ -393,67 +384,4 @@ func YouTube_CreateRecord(record *models.MarketingWebsiteVideo) error {
 	dbInst := db.GetDB()
 	result := dbInst.Create(&record)
 	return result.Error
-}
-
-func YouTube_ParseByChatGpt(info *YouTubeVideo_Info) error {
-	openaiKey := os.Getenv("CHATGPT_API_KEY")
-	client := openai.NewClient(openaiKey)
-	prompt := fmt.Sprintf("two-sentence summary, the programming language used, the libraries used, the website being scraped, the page types being scraped, the sophistication of the code - beginner, immediate, professional from the following description and transcript:\n %s, %s", info.Desc, info.Transcript)
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			// Model: openai.GPT4oMini,
-			Model: openai.GPT4oMini20240718,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
-			},
-		},
-	)
-	if err != nil {
-		println(err.Error())
-		return err
-	}
-	content := strings.ReplaceAll(resp.Choices[0].Message.Content, "*", "")
-	sentences := strings.Split(content, "\n")
-	parsedCount := 0
-	for _, sentence := range sentences {
-		if len(sentence) < 3 {
-			continue
-		}
-		tags := strings.Split(sentence, ":")
-		if len(tags) == 1 {
-			info.Summary = strings.TrimSpace(tags[0])
-			parsedCount++
-		}
-		if len(tags) == 2 {
-			key := strings.ToLower(tags[0])
-			value := strings.TrimSpace(tags[1])
-			if strings.Contains(key, "programming language used") {
-				info.Language = value
-				parsedCount++
-			} else if strings.Contains(key, "libraries used") {
-				info.Libraries = value
-				parsedCount++
-			} else if strings.Contains(key, "website being scraped") {
-				info.WebPage = value
-				parsedCount++
-			} else if strings.Contains(key, "page types being scraped") {
-				info.PageType = value
-				parsedCount++
-			} else if strings.Contains(key, "sophistication of the code") {
-				info.CodeLevel = value
-				parsedCount++
-			} else if strings.Contains(key, "summary") {
-				info.Summary = value
-				parsedCount++
-			}
-		}
-	}
-	if parsedCount != 6 {
-		return errors.New("insufficient parse")
-	}
-	return nil
 }
