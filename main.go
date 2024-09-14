@@ -49,7 +49,8 @@ func main() {
 		go workers.CronCheckEnterpriseUserPerformance()
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
-		workers.CronCheckProxyProviderCredits()
+		go workers.CronCheckProxyProviderCredits()
+		workers.CronProxyTesterQueue()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
 
