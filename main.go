@@ -50,9 +50,10 @@ func main() {
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
 		go workers.CronCheckProxyProviderCredits()
-		go workers.CronScrapeGithubRepo()
-		go workers.CronScrapeYoutubeVideo()
-		go workers.CronScrapeGoogleArticle()
+		#go workers.CronScrapeGithubRepo()
+		#go workers.CronScrapeYoutubeVideo()
+		#go workers.CronScrapeGoogleArticle()
+		workers.CronProxyTesterQueue()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
 
