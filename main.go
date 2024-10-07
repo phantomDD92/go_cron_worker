@@ -50,6 +50,9 @@ func main() {
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
 		go workers.CronCheckProxyProviderCredits()
+		#go workers.CronScrapeGithubRepo()
+		#go workers.CronScrapeYoutubeVideo()
+		#go workers.CronScrapeGoogleArticle()
 		workers.CronProxyTesterQueue()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
@@ -58,7 +61,6 @@ func main() {
 		logger.LogTextSpace("DEVELOPMENT MODE: No args specified. Use args to specify which worker to run.")
 
 	} else {
-
 		if args[0] == "test" {
 
 			// workers.RunTestScript()
@@ -149,6 +151,18 @@ func main() {
 
 		if args[0] == "RunProxyTesterQueue" {
 			workers.RunProxyTesterQueue()
+		}
+
+		if args[0] == "CheckGithubScraper" {
+			workers.RunScrapeGithubRepo()
+		}
+
+		if args[0] == "CheckYoutubeScraper" {
+			workers.RunScrapeYoutubeVideo()
+		}
+
+		if args[0] == "CheckArticleScraper" {
+			workers.RunScrapeGoogleArticle()
 		}
 	}
 }
