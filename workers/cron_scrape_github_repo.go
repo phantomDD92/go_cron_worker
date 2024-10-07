@@ -14,13 +14,23 @@ import (
 	"time"
 )
 
+func CronScrapeGithubRepo() {
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(60).Minutes().Do(RunScrapeGithubRepo)
+	s.StartBlocking()
+}
+
+func RunScrapeGithubRepo() {
+	Github_SearchRepos("amazon scraper")
+}
+
 func Github_SearchRepos(query string) {
 	fileName := "cron_scrape_github_repo.go"
 	emptyErrMap := make(map[string]interface{})
 	var searchResult utils.Github_SearchResult
 	var updateCount, createCount int
 	var newRepos []string
-	pageMax := 100
+	pageMax := 2
 	page := 1
 	for page = 1; page <= pageMax; page += 1 {
 		log.Println("### : Page ", page)
@@ -28,7 +38,7 @@ func Github_SearchRepos(query string) {
 			logger.LogError("ERROR", fileName, err, "Error scrape github search", emptyErrMap)
 			break
 		}
-		pageMax = searchResult.Payload.PageCount
+		// pageMax = searchResult.Payload.PageCount
 		for _, el := range searchResult.Payload.Results {
 			record := models.GithubRepo{}
 			answer := utils.ChatGPT_Answer{}
@@ -92,14 +102,4 @@ func Github_SearchRepos(query string) {
 	}
 	headline := fmt.Sprintf("Github Scraping Report for '%s' ", query)
 	slack.SlackStatsAlert("#test-slack-notifications", headline, builder.String())
-}
-
-func CronScrapeGithubRepo() {
-	s := gocron.NewScheduler(time.UTC)
-	s.Every(60).Minutes().Do(RunScrapeGithubRepo)
-	s.StartBlocking()
-}
-
-func RunScrapeGithubRepo() {
-	Github_SearchRepos("amazon scraper")
 }

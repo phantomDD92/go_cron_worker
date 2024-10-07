@@ -3,15 +3,15 @@ module go_proxy_worker
 go 1.16
 
 require (
-	github.com/PuerkitoBio/goquery v1.9.2 // indirect
+	github.com/PuerkitoBio/goquery v1.9.2
 	github.com/aws/aws-sdk-go v1.44.39
 	github.com/fatih/structs v1.1.0
 	github.com/go-co-op/gocron v1.10.0
 	github.com/go-redis/redis/v8 v8.11.4
-	github.com/jackc/pgx/v4 v4.14.0 // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
-	github.com/sashabaranov/go-openai v1.28.2 // indirect
+	github.com/lib/pq v1.10.2 // indirect
+	github.com/sashabaranov/go-openai v1.28.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/slack-go/slack v0.9.4
 	github.com/stretchr/testify v1.8.4 // indirect

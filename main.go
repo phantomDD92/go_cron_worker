@@ -50,9 +50,9 @@ func main() {
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
 		go workers.CronCheckProxyProviderCredits()
-		#go workers.CronScrapeGithubRepo()
-		#go workers.CronScrapeYoutubeVideo()
-		#go workers.CronScrapeGoogleArticle()
+		// go workers.CronScrapeGithubRepo()
+		// go workers.CronScrapeYoutubeVideo()
+		// go workers.CronScrapeGoogleArticle()
 		workers.CronProxyTesterQueue()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
@@ -153,15 +153,15 @@ func main() {
 			workers.RunProxyTesterQueue()
 		}
 
-		if args[0] == "CheckGithubScraper" {
+		if args[0] == "RunScrapeGithubRepo" {
 			workers.RunScrapeGithubRepo()
 		}
 
-		if args[0] == "CheckYoutubeScraper" {
+		if args[0] == "RunScrapeYoutubeVideo" {
 			workers.RunScrapeYoutubeVideo()
 		}
 
-		if args[0] == "CheckArticleScraper" {
+		if args[0] == "RunScrapeGoogleArticle" {
 			workers.RunScrapeGoogleArticle()
 		}
 	}
