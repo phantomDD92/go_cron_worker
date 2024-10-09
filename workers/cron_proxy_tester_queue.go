@@ -32,9 +32,10 @@ import (
 )
 
 type SopsProxyTestResponse struct {
-	TestResults     []map[string]interface{} `json:"test_results"`
-	WorkingProxies  []WorkingProxy           `json:"working_proxies"`
-	CategoryProxies []map[string]interface{} `json:"category_proxies"`
+	UserProxyTestResults []map[string]interface{} `json:"user_proxy_test_results"`
+	TestResults          []map[string]interface{} `json:"test_results"`
+	WorkingProxies       []WorkingProxy           `json:"working_proxies"`
+	CategoryProxies      []map[string]interface{} `json:"category_proxies"`
 }
 
 type WorkingProxy struct {
