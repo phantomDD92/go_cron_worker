@@ -124,6 +124,7 @@ func MakeProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]interf
 
 	// Create Request
 	var req *http.Request
+	var proxyTestEndpoint string
 
 	// proxyTestSetup["api_key"] = "85bb39cd-c5a6-44cc-9221-401e860e52b1"
 	postBody, _ := json.Marshal(proxyTestSetup)
@@ -131,16 +132,19 @@ func MakeProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]interf
 
 	if proxyTestSetup["test_type"] == nil || proxyTestSetup["test_type"] == "test_internal_proxy_pools" || proxyTestSetup["test_type"] == "" {
 		// Create Proxy Provider Test Request
-		proxyTestEndpoint := "https://backend.scrapeops.io/test-proxies-providers/v2/"
+		proxyTestEndpoint = "https://backend.scrapeops.io/test-proxies-providers/v2/"
 		req, _ = http.NewRequest("POST", proxyTestEndpoint, postBodyBytes)
 		req.Header.Set("Content-Type", "application/json")
 	} else {
 		// test_user_proxy_settings
 		// Create User Proxy Settings Test Request
-		proxyTestEndpoint := "https://backend.scrapeops.io/test-user-proxy-settings/v1/"
+		proxyTestEndpoint = "https://backend.scrapeops.io/test-user-proxy-settings/v1/"
 		req, _ = http.NewRequest("POST", proxyTestEndpoint, postBodyBytes)
 		req.Header.Set("Content-Type", "application/json")
 	}
+
+	logger.LogTextValue("proxyTestEndpoint", proxyTestEndpoint)
+	logger.LogTextValue("Sent Request", proxyTestSetup["test_id"])
 
 	// Update DB With Test Status
 	sopsProxyTestResultMap := map[string]interface{}{
@@ -151,21 +155,20 @@ func MakeProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]interf
 	result := db.Model(&sopsProxyTestResult).Where("id = ?", proxyTestSetup["test_id"]).Updates(sopsProxyTestResultMap)
 	if result.Error != nil || result.RowsAffected == 0 {
 		errData := structs.Map(sopsProxyTestResult)
-		logger.LogError("ERROR", fileName, result.Error, "Failed to update or create accountProxyStats in DB", errData)
+		logger.LogError("ERROR", fileName, result.Error, "Failed to update sopsProxyTestResultMap in DB", errData)
 	}
-
-	logger.LogTextValue("Sent Request", proxyTestSetup["test_id"])
 
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.LogTextValue("error", proxyTestSetup)
+		logger.LogTextValue("error", err)
+		logger.LogTextValue("proxyTestSetup", proxyTestSetup)
 
 		// Update DB for Failed Test
-		sopsProxyTestResultMap["status"] = "failed"
+		sopsProxyTestResultMap["test_status"] = "failed"
 		result := db.Model(&sopsProxyTestResult).Where("id = ?", proxyTestSetup["test_id"]).Updates(sopsProxyTestResultMap)
 		if result.Error != nil || result.RowsAffected == 0 {
 			errData := structs.Map(sopsProxyTestResult)
-			logger.LogError("ERROR", fileName, result.Error, "Failed to update or create accountProxyStats in DB", errData)
+			logger.LogError("ERROR", fileName, result.Error, "Failed to update or create sopsProxyTestResultMap in DB", errData)
 		}
 
 	} else {
@@ -186,6 +189,10 @@ func MakeProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]interf
 
 		sopsProxyTestResultMap["test_status"] = "completed"
 		sopsProxyTestResultMap["test_results"] = jsonSopsProxyTestResponse
+
+		logger.LogTextValue("", "")
+		logger.LogTextValue("sopsProxyTestResponse", sopsProxyTestResponse)
+		// logger.LogTextValue("sopsProxyTestResultMap", sopsProxyTestResultMap)
 
 		// Update DB for Failed Test
 		result := db.Model(&sopsProxyTestResult).Where("id = ?", proxyTestSetup["test_id"]).Updates(sopsProxyTestResultMap)

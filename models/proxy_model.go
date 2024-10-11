@@ -174,6 +174,7 @@ type SopsProxyTestResult struct {
 	TestResults           json.RawMessage `json:"test_results"`
 	TestName              string          `json:"test_name"`
 	TestNotes             string          `json:"test_notes"`
+	TestType              string          `json:"test_type"`
 	TestSuggestedSequence string          `json:"test_suggested_sequence"`
 	FinalSequence         string          `json:"final_sequence"`
 	CreatedAt             time.Time       `json:"created_at"`
