@@ -180,7 +180,7 @@ func RunUpdatePPGBProxyStats() {
 				////////
 
 				//accountTotalBandwidthUsedValue
-				accountTotalBandwidthUsedValue, err := statsProxyRedisClient.Get(redisContext, accountTotalBandwidthUsedKey).Result()
+				accountTotalBandwidthUsedValue, err := coreProxyRedisClient.Get(redisContext, accountTotalBandwidthUsedKey).Result()
 				if err != nil {
 					errData := map[string]interface{}{
 						"accountTotalBandwidthUsedValue": accountTotalBandwidthUsedValue,
@@ -189,7 +189,7 @@ func RunUpdatePPGBProxyStats() {
 				}
 
 				//accountTotalCreditsUsedValue
-				accountTotalCreditsUsedValue, err := statsProxyRedisClient.Get(redisContext, accountTotalCreditsUsedKey).Result()
+				accountTotalCreditsUsedValue, err := coreProxyRedisClient.Get(redisContext, accountTotalCreditsUsedKey).Result()
 				if err != nil {
 					errData := map[string]interface{}{
 						"accountTotalCreditsUsedValue": accountTotalCreditsUsedValue,
