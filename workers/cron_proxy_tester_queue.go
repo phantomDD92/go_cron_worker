@@ -129,7 +129,7 @@ func MakeProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]interf
 	postBody, _ := json.Marshal(proxyTestSetup)
 	postBodyBytes := bytes.NewBuffer(postBody)
 
-	if proxyTestSetup["test_type"] == "test_internal_proxy_pools" {
+	if proxyTestSetup["test_type"] == nil || proxyTestSetup["test_type"] == "test_internal_proxy_pools" || proxyTestSetup["test_type"] == "" {
 		// Create Proxy Provider Test Request
 		proxyTestEndpoint := "https://backend.scrapeops.io/test-proxies-providers/v2/"
 		req, _ = http.NewRequest("POST", proxyTestEndpoint, postBodyBytes)
