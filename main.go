@@ -49,11 +49,11 @@ func main() {
 		go workers.CronCheckEnterpriseUserPerformance()
 		go workers.CronCheckProxyProviderDown()
 		go workers.CronCheckProxyApiProfitability()
-		workers.CronCheckProxyProviderCredits()
+		go workers.CronCheckProxyProviderCredits()
 		// go workers.CronScrapeGithubRepo()
 		// go workers.CronScrapeYoutubeVideo()
 		// go workers.CronScrapeGoogleArticle()
-		// workers.CronProxyTesterQueue()
+		workers.CronProxyTesterQueue()
 
 	} else if !utils.ProdEnv() && len(args) == 0 {
 
