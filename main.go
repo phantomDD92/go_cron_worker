@@ -153,6 +153,10 @@ func main() {
 			workers.RunProxyTesterQueue()
 		}
 
+		if args[0] == "CronProxyTesterQueue" {
+			workers.CronProxyTesterQueue()
+		}
+
 		if args[0] == "RunScrapeGithubRepo" {
 			workers.RunScrapeGithubRepo()
 		}

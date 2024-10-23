@@ -101,14 +101,17 @@ func RunProxyTesterQueue() {
 		}
 
 		wg.Add(1)
-		// go MakeProxyTesterRequest(&wg, proxyTestSetup, fileName)
+		go MakeProxyTesterRequest(&wg, proxyTestSetup, fileName)
 
-		if proxyTestSetup["test_type"] == nil || proxyTestSetup["test_type"] == "test_internal_proxy_pools" || proxyTestSetup["test_type"] == "" {
-			go MakeInternalProxyTesterRequest(&wg, proxyTestSetup, fileName)
-		} else {
-			go MakeInternalProxyTesterRequest(&wg, proxyTestSetup, fileName)
-			go MakeUserProxyTesterRequest(&wg, proxyTestSetup, fileName)
-		}
+		// if proxyTestSetup["test_type"] == nil || proxyTestSetup["test_type"] == "test_internal_proxy_pools" || proxyTestSetup["test_type"] == "" {
+		// 	wg.Add(1)
+		// 	go MakeInternalProxyTesterRequest(&wg, proxyTestSetup, fileName)
+		// } else {
+		// 	wg.Add(1)
+		// 	go MakeInternalProxyTesterRequest(&wg, proxyTestSetup, fileName)
+		// 	wg.Add(1)
+		// 	go MakeUserProxyTesterRequest(&wg, proxyTestSetup, fileName)
+		// }
 
 	}
 
@@ -270,8 +273,8 @@ func MakeInternalProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[strin
 	req, _ = http.NewRequest("POST", proxyTestEndpoint, postBodyBytes)
 	req.Header.Set("Content-Type", "application/json")
 
-	logger.LogTextValue("proxyTestEndpoint", proxyTestEndpoint)
-	logger.LogTextValue("Sent Request", proxyTestSetup["test_id"])
+	logger.LogTextValue("Internal Test proxyTestEndpoint", proxyTestEndpoint)
+	logger.LogTextValue("Internal Test Sent Request", proxyTestSetup["test_id"])
 
 	var sopsProxyTestResult models.SopsProxyTestResult
 
@@ -289,8 +292,8 @@ func MakeInternalProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[strin
 
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.LogTextValue("error", err)
-		logger.LogTextValue("proxyTestSetup", proxyTestSetup)
+		logger.LogTextValue("Internal Test error", err)
+		logger.LogTextValue("Internal Test proxyTestSetup", proxyTestSetup)
 
 		// Update DB for Failed Test
 		if proxyTestSetup["test_type"] == "test_internal_proxy_pools" {
@@ -303,8 +306,8 @@ func MakeInternalProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[strin
 		}
 
 	} else {
-		logger.LogTextValue("Test Response", "")
-		logger.LogTextValueSpace("proxy response code", resp.StatusCode)
+		logger.LogTextValue("Internal Test Response", "")
+		logger.LogTextValueSpace("Internal Test response code", resp.StatusCode)
 
 		defer resp.Body.Close()
 
@@ -313,7 +316,7 @@ func MakeInternalProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[strin
 		json.NewDecoder(resp.Body).Decode(&sopsProxyTestResponse)
 
 		// logger.LogTextValue("", "")
-		// logger.LogTextValue("sopsProxyTestResponse", sopsProxyTestResponse)
+		logger.LogTextValue("Internal Test sopsProxyTestResponse", sopsProxyTestResponse)
 		// logger.LogTextValue("sopsProxyTestResultMap", sopsProxyTestResultMap)
 
 		if proxyTestSetup["test_type"] == "test_internal_proxy_pools" {
@@ -421,8 +424,8 @@ func MakeUserProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]in
 	req, _ = http.NewRequest("POST", proxyTestEndpoint, postBodyBytes)
 	req.Header.Set("Content-Type", "application/json")
 
-	logger.LogTextValue("proxyTestEndpoint", proxyTestEndpoint)
-	logger.LogTextValue("Sent Request", proxyTestSetup["test_id"])
+	logger.LogTextValue("User Test proxyTestEndpoint", proxyTestEndpoint)
+	logger.LogTextValue("User Test Sent Request", proxyTestSetup["test_id"])
 
 	var sopsProxyTestResult models.SopsProxyTestResult
 
@@ -437,8 +440,8 @@ func MakeUserProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]in
 
 	resp, err := client.Do(req)
 	if err != nil {
-		logger.LogTextValue("error", err)
-		logger.LogTextValue("proxyTestSetup", proxyTestSetup)
+		logger.LogTextValue("User Test error", err)
+		logger.LogTextValue("User Test proxyTestSetup", proxyTestSetup)
 
 		// Update DB for Failed Test
 		sopsProxyTestResultMap["test_status"] = "failed"
@@ -449,8 +452,8 @@ func MakeUserProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]in
 		}
 
 	} else {
-		logger.LogTextValue("Test Response", "")
-		logger.LogTextValueSpace("proxy response code", resp.StatusCode)
+		logger.LogTextValue("User Test Response", "")
+		logger.LogTextValueSpace("User Test response code", resp.StatusCode)
 
 		defer resp.Body.Close()
 
@@ -459,7 +462,7 @@ func MakeUserProxyTesterRequest(wg *sync.WaitGroup, proxyTestSetup map[string]in
 		json.NewDecoder(resp.Body).Decode(&sopsProxyTestResponse)
 
 		// logger.LogTextValue("", "")
-		// logger.LogTextValue("sopsProxyTestResponse", sopsProxyTestResponse)
+		logger.LogTextValue("User Test  sopsProxyTestResponse", sopsProxyTestResponse)
 		// logger.LogTextValue("sopsProxyTestResultMap", sopsProxyTestResultMap)
 
 		// User Tests - Get Existing Results and Ammend New Results To Them
