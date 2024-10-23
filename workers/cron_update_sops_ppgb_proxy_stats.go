@@ -200,8 +200,12 @@ func RunUpdatePPGBProxyStats() {
 				// Parse the bandwidth string to uint64
 				accountTotalBandwidthInt := utils.StringToUint64(accountTotalBandwidthUsedValue)
 
+				// Parse the credits string to uint64
+				accountTotalCreditsInt := utils.StringToUint64(accountTotalCreditsUsedValue)
+
 				// Convert uint64 to uint (if it's safe to do so)
 				accountTotalBandwidthUInt := uint(accountTotalBandwidthInt)
+				accountTotalCreditsUInt := uint(accountTotalCreditsInt)
 
 				accountIdInt := utils.StringToUint64(accountId)
 
@@ -219,7 +223,7 @@ func RunUpdatePPGBProxyStats() {
 					ppgbOverallStats.FailedRequests = 0
 					ppgbOverallStats.TotalRequests = 1
 					ppgbOverallStats.BytesUsed = accountTotalBandwidthUInt
-					ppgbOverallStats.CreditsUsed = accountTotalBandwidthUInt
+					ppgbOverallStats.CreditsUsed = accountTotalCreditsUInt
 					// ppgbOverallStats.Type = "residential"
 
 					createResult := db.Create(&ppgbOverallStats)
@@ -233,7 +237,7 @@ func RunUpdatePPGBProxyStats() {
 					println("Updating account_ppgb_overall_stats row...")
 
 					//if the row exists then we just update the value
-					ppgbOverallStats.CreditsUsed = accountTotalBandwidthUInt
+					ppgbOverallStats.CreditsUsed = accountTotalCreditsUInt
 					ppgbOverallStats.BytesUsed = accountTotalBandwidthUInt
 					ppgbOverallStats.TotalRequests = ppgbOverallStats.TotalRequests + 1
 					updateResult := db.Save(&ppgbOverallStats)
